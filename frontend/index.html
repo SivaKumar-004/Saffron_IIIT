@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSphere - Precision Dashboard</title>
+    <!-- Modern Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Abstract Background -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    
+    <div class="dashboard-container">
+        <header>
+            <h1><span class="highlight">Agri</span>Sphere</h1>
+            <p>Real-Time Precision Farm Sensors</p>
+            <div class="connection-status">
+                <div class="status-indicator" id="status-dot"></div>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <main class="grid-layout">
+            <!-- Soil Moisture Card -->
+            <div class="card" id="card-moisture">
+                <div class="card-icon">💧</div>
+                <div class="card-header">Soil Moisture</div>
+                <div class="card-value" id="val-moisture">--<span class="unit">%</span></div>
+            </div>
+            
+            <!-- Soil Temperature Card -->
+            <div class="card" id="card-temperature">
+                <div class="card-icon">🌡️</div>
+                <div class="card-header">Soil Temperature</div>
+                <div class="card-value" id="val-temperature">--<span class="unit">°C</span></div>
+            </div>
+
+            <!-- Humidity Card -->
+            <div class="card" id="card-humidity">
+                <div class="card-icon">☁️</div>
+                <div class="card-header">Air Humidity</div>
+                <div class="card-value" id="val-humidity">--<span class="unit">%</span></div>
+            </div>
+
+            <!-- Light Intensity Card -->
+            <div class="card" id="card-light">
+                <div class="card-icon">☀️</div>
+                <div class="card-header">Light Intensity</div>
+                <div class="card-value" id="val-light" style="text-transform: capitalize;">--</div>
+            </div>
+
+            <!-- Recommendation Alert Card (Spans full width) -->
+            <div class="card alert-card" id="card-recommendation">
+                <div class="alert-content">
+                    <div class="alert-icon">🤖</div>
+                    <div class="alert-text">
+                        <div class="card-header">Agent Recommendation</div>
+                        <div class="recommendation-value" id="val-recommendation">Waiting for data...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Frontend logic -->
+    <script src="app.js"></script>
+</body>
+</html>
