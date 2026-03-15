@@ -158,10 +158,23 @@ async def dashboard_websocket(websocket: WebSocket):
     Provides live telemetry for the Tier 2 Advanced Farm Dashboard.
     """
     await websocket.accept()
-    try:
-        while True:
-            try:
-                # Gather data concurrently from all agents to avoid halting the event loop unnecessarily
+    
+    state = {"crop": "tomato"}
+    
+    async def receive_loop():
+        try:
+            while True:
+                data = await websocket.receive_text()
+                parsed = json.loads(data)
+                if parsed.get("type") == "set_crop":
+                    state["crop"] = parsed.get("crop", "tomato")
+        except Exception:
+            pass
+            
+    async def send_loop():
+        try:
+            while True:
+                # Gather data concurrently from all agents
                 sensor_task = asyncio.create_task(async_analyze_farm())
                 climate_task = asyncio.create_task(async_analyze_climate("Tamil Nadu"))
                 
@@ -174,7 +187,7 @@ async def dashboard_websocket(websocket: WebSocket):
                 moisture_val = sensor_data.get('data', {}).get('soil_moisture', 40.0)
                 
                 # Plant intelligence driven by mock sensor
-                plant_res = await async_analyze_plant("tomato", float(moisture_val))
+                plant_res = await async_analyze_plant(state["crop"], float(moisture_val))
                 plant_data = plant_res if not isinstance(plant_res, Exception) else {"status": "error", "recommendation": "Plant logic offline"}
 
                 payload = {
@@ -185,13 +198,20 @@ async def dashboard_websocket(websocket: WebSocket):
                 }
                 
                 await websocket.send_text(json.dumps(payload))
-            except Exception as e:
-                print(f"Internal Dashboard Stream Error: {e}")
-            
-            await asyncio.sleep(3) 
-            
+                await asyncio.sleep(3) 
+        except Exception as e:
+            print(f"Internal Dashboard Stream Error: {e}")
+
+    rcvr = asyncio.create_task(receive_loop())
+    sndr = asyncio.create_task(send_loop())
+    
+    try:
+        done, pending = await asyncio.wait([rcvr, sndr], return_when=asyncio.FIRST_COMPLETED)
+        for task in pending:
+            task.cancel()
     except WebSocketDisconnect:
         print("Dashboard WebSocket disconnected.")
+        for task in [rcvr, sndr]: task.cancel()
     except Exception as e:
         print(f"WebSocket Critical Failure: {e}")
         await websocket.close()

@@ -6,7 +6,27 @@
     <title>AgriSphere - Tier 2: Advanced Farm Telemetry</title>
     <!-- Modern Font: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="farm-panel/style.css">
+    <link rel="stylesheet" href="farm-panel/style.css?v=3">
+    <style>
+        .crop-input-wrapper {
+            margin-top: 10px;
+        }
+        .crop-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .crop-input:focus {
+            border-color: var(--primary-green);
+        }
+    </style>
 </head>
 <body>
     <!-- Abstract Background Blobs -->
@@ -69,18 +89,21 @@
 
             <div class="card" id="card-plant-health">
                 <div class="card-icon">🥬</div>
-                <div class="card-header">Crop Status (Tomato)</div>
-                <div class="card-value" id="val-plant-status" style="font-size: 2rem;">--</div>
+                <div class="card-header">Crop Status</div>
+                <div class="card-value" id="val-plant-status" style="font-size: 1.5rem;">--</div>
+                <div class="crop-input-wrapper">
+                    <input type="text" id="crop-input" class="crop-input" placeholder="Enter crop (e.g., Tomato)" value="Tomato">
+                </div>
             </div>
 
             <!-- RECOMMENDER PANEL -->
-            <div class="section-title">🤖 Unified Agent Recommendations</div>
+            <div class="section-title">🤖 Multi Agent Result</div>
             
             <div class="card alert-card" id="card-recommendation">
                 <div class="alert-content">
                     <div class="alert-icon">💡</div>
                     <div class="alert-text">
-                        <div class="card-header" id="rec-header">System Recommendation</div>
+                        <div class="card-header" id="rec-header">Multi Agent Result</div>
                         <div class="recommendation-value" id="val-recommendation">Initializing multi-agent analysis...</div>
                     </div>
                 </div>
@@ -88,6 +111,6 @@
         </main>
     </div>
 
-    <script src="farm-panel/app.js"></script>
+    <script src="farm-panel/app.js?v=3"></script>
 </body>
 </html>
