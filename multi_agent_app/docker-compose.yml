@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: agrisphere_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # This saves your SQLite database locally so it survives container restarts
+      - ./backend/data:/app/data 
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    # THE FAILSAFE: Strict resource limits for your laptop
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  frontend:
+    image: nginx:alpine
+    container_name: agrisphere_frontend
+    ports:
+      - "80:80"
+    volumes:
+      # Mounts your vanilla HTML/JS/CSS files straight to Nginx
+      - ./frontend:/usr/share/nginx/html:ro 
+      # Optional: Mount a custom nginx.conf if you need strict CORS handling
+      # - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    # Nginx is incredibly light, so we cap it aggressively
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
