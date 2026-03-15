@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const valHumidity = document.getElementById('val-humidity');
     const valLight = document.getElementById('val-light');
     const valRecommendation = document.getElementById('val-recommendation');
+    const btnAnomaly = document.getElementById('btn-anomaly');
+    const valAgentInsight = document.getElementById('val-agent-insight');
 
     // Attempt to connect to WebSocket on the same host (assuming standard port fallback to localhost:8000)
     // Adjusting for both cases: running frontend locally without server vs mounting to FastAPI directly.
@@ -32,6 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (payload.status === 'ok') {
                     updateDashboard(payload.data, payload.recommendation);
+                    // Update CrewAI Insights
+                    if (payload.agent_insight && valAgentInsight.innerText !== payload.agent_insight) {
+                        valAgentInsight.innerText = payload.agent_insight;
+                        // Auto scroll to bottom of logs
+                        valAgentInsight.scrollTop = valAgentInsight.scrollHeight;
+                    }
                 } else {
                     console.error("Agent returned error:", payload);
                     valRecommendation.innerText = payload.recommendation;
@@ -85,10 +93,30 @@ document.addEventListener('DOMContentLoaded', () => {
             valRecommendation.style.color = 'var(--accent-orange)';
             recCard.style.borderLeftColor = 'var(--accent-orange)';
         } else {
-            valRecommendation.style.color = 'var(--accent-green)';
             recCard.style.borderLeftColor = 'var(--accent-green)';
         }
     }
+
+    // Handle Anomaly Injection
+    btnAnomaly.addEventListener('click', async () => {
+        try {
+            btnAnomaly.innerText = "Processing...";
+            btnAnomaly.disabled = true;
+            btnAnomaly.style.opacity = "0.5";
+            
+            const res = await fetch(`http://${wsHost}:${wsPort}/api/inject-anomaly`, { method: 'POST' });
+            if(res.ok) {
+                valAgentInsight.innerText += "\n\n[SYSTEM] Triggered Critical Drought Anomaly. CrewAI agents waking up to analyze...";
+            }
+        } catch (e) {
+            console.error("Failed to inject anomaly", e);
+        }
+        setTimeout(() => {
+            btnAnomaly.innerText = "⚠️ Force Drought Anomaly";
+            btnAnomaly.disabled = false;
+            btnAnomaly.style.opacity = "1";
+        }, 5000);
+    });
 
     // Initiate connection
     connect();

@@ -1,3 +1,8 @@
 fastapi
 uvicorn
 websockets
+crewai
+langchain-openai
+langchain-google-genai
+pydantic
+python-dotenv
