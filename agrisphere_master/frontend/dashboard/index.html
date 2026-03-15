@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSphere Live Dashboard</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --surface: #1e293b;
+            --primary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .panel {
+            background-color: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.75rem;
+        }
+
+        .data-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 1rem;
+        }
+
+        .data-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .recommendation {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Status Indicator Animation */
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--primary);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        #last-updated {
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌱 AgriSphere Master</h1>
+    <div class="subtitle"><span class="status-dot"></span> Live IoT Telemetry (Updates 5s)</div>
+
+    <div class="grid-container">
+        
+        <!-- Climate Intelligence Panel -->
+        <div class="panel" id="climate-panel">
+            <h2>🌍 Climate Intelligence</h2>
+            <div>
+                <div class="data-label">Risk Level</div>
+                <div class="data-value" id="climate-risk" style="color: var(--warning);">Loading...</div>
+                
+                <div class="data-label">Metrics (Temp / Rain / Hum)</div>
+                <div class="data-value" id="climate-metrics" style="font-size: 1.1rem;">-- / -- / --</div>
+            </div>
+            <div class="recommendation" id="climate-rec">Awaiting telemetry...</div>
+        </div>
+
+        <!-- Precision Sensor Panel -->
+        <div class="panel" id="farm-panel">
+            <h2>📡 Farm Sensors</h2>
+            <div>
+                <div class="data-label">Soil Moisture</div>
+                <div class="data-value" id="farm-moisture">--</div>
+
+                <div class="data-label">Soil Temp & Humidity</div>
+                <div class="data-value" id="farm-temp-hum" style="font-size: 1.1rem;">-- / --</div>
+            </div>
+            <div class="recommendation" id="farm-rec">Awaiting telemetry...</div>
+        </div>
+
+        <!-- Urban Smart Plant Panel -->
+        <div class="panel" id="plant-panel">
+            <h2>🌿 Smart Plant (Tomato)</h2>
+            <div>
+                <div class="data-label">Incoming Moisture</div>
+                <div class="data-value" id="plant-moisture">--</div>
+            </div>
+            <div class="recommendation" id="plant-rec">Awaiting telemetry...</div>
+        </div>
+
+    </div>
+
+    <div id="last-updated">Last sync: Never</div>
+
+    <script>
+        const API_BASE = "http://localhost:8000";
+
+        async function fetchAgentData() {
+            try {
+                // Fetch Climate
+                const climateRes = await fetch(`${API_BASE}/climate`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ region: "Tamil Nadu" }) 
+                });
+                const climateData = await climateRes.json();
+                const risks = climateData.data.risks || [];
+                const riskText = risks.length === 0 ? "Normal" : risks.join(", ");
+                document.getElementById('climate-risk').innerText = riskText;
+                
+                // Color code risk
+                const r = document.getElementById('climate-risk');
+                if (risks.length === 0) r.style.color = "var(--primary)";
+                else if (riskText.includes("Risk")) r.style.color = "var(--warning)";
+                else r.style.color = "var(--danger)";
+
+                document.getElementById('climate-metrics').innerText = `${climateData.data.temperature} / ${climateData.data.rainfall} / ${climateData.data.humidity}`;
+                document.getElementById('climate-rec').innerText = climateData.recommendation;
+
+                // Fetch Farm Sensors
+                const farmRes = await fetch(`${API_BASE}/farm`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}) 
+                });
+                const farmData = await farmRes.json();
+                // We use mock values passed from farm to plant agent later to show integration
+                const mockMoisture = farmData.data.soil_moisture;
+
+                document.getElementById('farm-moisture').innerText = mockMoisture + "%";
+                document.getElementById('farm-temp-hum').innerText = `${farmData.data.temperature}°C / ${farmData.data.humidity}%`;
+                document.getElementById('farm-rec').innerText = farmData.recommendation;
+
+                // Fetch Plant Data (Passes dynamic mock moisture to test Smart Logic)
+                const plantPayload = {
+                    query_type: "plant",
+                    plant_name: "tomato",
+                    soil_moisture: parseFloat(mockMoisture)
+                };
+
+                const plantRes = await fetch(`${API_BASE}/ask-agrisphere`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(plantPayload) 
+                });
+                const plantData = await plantRes.json();
+                
+                document.getElementById('plant-moisture').innerText = plantData.data.moisture + "%";
+                document.getElementById('plant-rec').innerText = plantData.recommendation;
+
+                // Update timestamp
+                document.getElementById('last-updated').innerText = "Last sync: " + new Date().toLocaleTimeString();
+
+            } catch (error) {
+                console.error("Failed to fetch agent data:", error);
+            }
+        }
+
+        // Initial fetch and 5-second polling interval
+        fetchAgentData();
+        setInterval(fetchAgentData, 5000);
+    </script>
+</body>
+</html>

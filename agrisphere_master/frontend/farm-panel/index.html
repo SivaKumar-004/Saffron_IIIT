@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSphere - Tier 2: Advanced Farm Telemetry</title>
+    <!-- Modern Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Abstract Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    
+    <div style="position: absolute; top: 20px; left: 20px; z-index: 100;">
+        <a href="/" style="color: rgba(255,255,255,0.7); text-decoration: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: color 0.2s;">← Back to Main Menu</a>
+    </div>
+
+    <div class="dashboard-container">
+        <header>
+            <h1>Tier 2: <span class="highlight">Advanced</span> Farm Telemetry</h1>
+            <p>Live IoT Multi-Agent Intelligence System</p>
+            <div class="connection-status">
+                <div class="status-indicator" id="status-dot"></div>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <main class="grid-layout">
+            <!-- SECTION 1: PRECISION SENSORS -->
+            <div class="section-title">📡 Real-Time Telemetry</div>
+            
+            <div class="card" id="card-moisture">
+                <div class="card-icon">💧</div>
+                <div class="card-header">Soil Moisture</div>
+                <div class="card-value" id="val-moisture">--<span class="unit">%</span></div>
+            </div>
+            
+            <div class="card" id="card-temperature">
+                <div class="card-icon">🌡️</div>
+                <div class="card-header">Soil Temp</div>
+                <div class="card-value" id="val-temperature">--<span class="unit">°C</span></div>
+            </div>
+
+            <div class="card" id="card-humidity">
+                <div class="card-icon">☁️</div>
+                <div class="card-header">Air Humidity</div>
+                <div class="card-value" id="val-humidity">--<span class="unit">%</span></div>
+            </div>
+
+            <!-- SECTION 2: CLIMATE & ENV -->
+            <div class="section-title">🌍 Climate Intelligence</div>
+
+            <div class="card" id="card-climate-risk">
+                <div class="card-icon">🚨</div>
+                <div class="card-header">Environmental Risk</div>
+                <div class="card-value" id="val-climate-risk" style="font-size: 2rem;">--</div>
+            </div>
+
+            <div class="card" id="card-rainfall">
+                <div class="card-icon">🌧️</div>
+                <div class="card-header">Predicted Rain</div>
+                <div class="card-value" id="val-rainfall">--<span class="unit">mm</span></div>
+            </div>
+
+            <!-- SECTION 3: PLANT HEALTH -->
+            <div class="section-title">🌿 Urban Smart Plant</div>
+
+            <div class="card" id="card-plant-health">
+                <div class="card-icon">🥬</div>
+                <div class="card-header">Crop Status (Tomato)</div>
+                <div class="card-value" id="val-plant-status" style="font-size: 2rem;">--</div>
+            </div>
+
+            <!-- RECOMMENDER PANEL -->
+            <div class="section-title">🤖 Unified Agent Recommendations</div>
+            
+            <div class="card alert-card" id="card-recommendation">
+                <div class="alert-content">
+                    <div class="alert-icon">💡</div>
+                    <div class="alert-text">
+                        <div class="card-header" id="rec-header">System Recommendation</div>
+                        <div class="recommendation-value" id="val-recommendation">Initializing multi-agent analysis...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

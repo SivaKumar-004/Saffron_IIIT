@@ -1,0 +1,26 @@
+[
+    {
+        "phone": "9988776655",
+        "region": "Kerala",
+        "name": "Fallback User",
+        "crop": "Unknown"
+    },
+    {
+        "phone": "8590986738",
+        "region": "Kerala",
+        "name": "Fallback User",
+        "crop": "Unknown"
+    },
+    {
+        "phone": "2023423432",
+        "region": "Punjab",
+        "name": "Fallback User",
+        "crop": "Unknown"
+    },
+    {
+        "phone": "9023423432",
+        "region": "Punjab",
+        "name": "Fallback User",
+        "crop": "Unknown"
+    }
+]

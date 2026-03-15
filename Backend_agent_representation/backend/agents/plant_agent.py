@@ -1,0 +1,55 @@
+# Urban Smart Plant Agent
+
+COMPATIBLE_PLANTS = {
+    "tomato": ["basil", "marigold", "onion"],
+    "carrot": ["lettuce", "radish", "pea"],
+    "basil": ["tomato", "pepper", "oregano"],
+    "lettuce": ["carrot", "radish", "cucumber"],
+    "pepper": ["basil", "tomato", "parsley"],
+    "potato": ["beans", "corn", "cabbage"]
+}
+
+def analyze_plant(plant_name: str, soil_moisture: float = 40.0, light_level: str = "medium", temperature: float = 22.0) -> dict:
+    """
+    Analyzes plant health and identifies companion plants.
+    """
+    # SECURITY: Strict length and type sanitization
+    plant_name = str(plant_name)[:50].lower().strip() if plant_name else "unknown"
+    light_level = str(light_level).lower().strip() if light_level else "medium"
+    
+    try:
+        soil_moisture = float(soil_moisture)
+    except (ValueError, TypeError):
+        soil_moisture = 40.0
+        
+    try:
+        temperature = float(temperature)
+    except (ValueError, TypeError):
+        temperature = 22.0
+        
+    recommendations = []
+    
+    if soil_moisture < 30:
+        recommendations.append("Water the plant today.")
+    if light_level == "low":
+        recommendations.append("Move plant to sunlight.")
+    if temperature > 35:
+        recommendations.append("Move plant to shade.")
+        
+    good_pairs = COMPATIBLE_PLANTS.get(plant_name, [])
+    if good_pairs:
+        recommendations.append(f"Companion plants: {', '.join(good_pairs)}.")
+
+    if not recommendations:
+        recommendations.append("Plant conditions are optimal.")
+
+    return {
+        "agent": "plant_agent",
+        "status": "ok",
+        "data": {
+            "plant": plant_name,
+            "moisture": f"{soil_moisture}%",
+            "light": light_level
+        },
+        "recommendation": " ".join(recommendations)
+    }

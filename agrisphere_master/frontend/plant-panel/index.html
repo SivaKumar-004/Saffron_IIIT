@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSphere - Smart Plant</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --surface: #1e293b;
+            --primary: #8b5cf6; /* Purple for plant logic */
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .back-link {
+            align-self: flex-start;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--text-main); }
+
+        .panel {
+            background-color: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h2 { margin-top: 0; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1rem; }
+        .data-label { color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1.5rem; }
+        .data-value { font-size: 1.75rem; font-weight: 600; margin-top: 0.5rem; }
+        .recommendation { margin-top: 2rem; padding: 1.25rem; background-color: rgba(139, 92, 246, 0.1); border-left: 4px solid var(--primary); border-radius: 4px; line-height: 1.6; }
+        .status-dot { height: 10px; width: 10px; background-color: var(--primary); border-radius: 50%; display: inline-block; box-shadow: 0 0 8px var(--primary); animation: pulse 2s infinite; }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+        #last-updated { margin-top: 2rem; font-size: 0.875rem; color: var(--text-muted); }
+        
+        /* Interactive element for plant type */
+        select {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Back to Main Menu</a>
+    
+    <div class="panel" id="plant-panel">
+        <h2>🌿 Tier 3: Urban Smart Plant Agent (Tomato Focus)</h2>
+        <div>
+            <div class="data-label">Live Status <span class="status-dot" style="margin-left: 10px;"></span></div>
+            
+            <div class="data-label" style="margin-top: 1rem;">Select Crop Type</div>
+            <select id="plant-selector" onchange="fetchAgentData()">
+                <option value="tomato">Tomato</option>
+                <option value="carrot">Carrot</option>
+                <option value="basil">Basil</option>
+                <option value="lettuce">Lettuce</option>
+                <option value="pepper">Pepper</option>
+                <option value="potato">Potato</option>
+            </select>
+
+            <div class="data-label">Incoming Moisture (Mocked from Farm Tier)</div>
+            <div class="data-value" id="plant-moisture">Loading...</div>
+        </div>
+        <div class="recommendation" id="plant-rec">Awaiting telemetry...</div>
+    </div>
+    <div id="last-updated">Last sync: Never</div>
+
+    <script>
+        const API_BASE = "http://localhost:8000";
+        let lastMoisture = 40.0;
+
+        async function fetchAgentData() {
+            try {
+                // First grab fresh simulated moisture from the farm agent
+                // In a real microservice architecture, agents might communicate directly
+                // but here the frontend orchestrates the flow.
+                const farmRes = await fetch(`${API_BASE}/farm`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}) 
+                });
+                const farmData = await farmRes.json();
+                lastMoisture = farmData.data.soil_moisture || lastMoisture;
+                
+                const selectedPlant = document.getElementById('plant-selector').value;
+
+                const plantPayload = {
+                    query_type: "plant",
+                    plant_name: selectedPlant,
+                    soil_moisture: parseFloat(lastMoisture)
+                };
+
+                const plantRes = await fetch(`${API_BASE}/ask-agrisphere`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(plantPayload) 
+                });
+                const plantData = await plantRes.json();
+                
+                // Note: The upgraded plant_agent returns moisture inside the payload, but the original
+                // plant_agent and farm_agent may return it directly in data. Handled dynamically.
+                const displayMoisture = plantData.data.moisture || plantData.data.soil_moisture || lastMoisture;
+                document.getElementById('plant-moisture').innerText = displayMoisture + "%";
+                document.getElementById('plant-rec').innerText = plantData.recommendation;
+                document.getElementById('last-updated').innerText = "Last sync: " + new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error("Failed to fetch agent data:", error);
+                document.getElementById('plant-moisture').innerText = "Connection Error";
+            }
+        }
+
+        fetchAgentData();
+        setInterval(fetchAgentData, 5000);
+    </script>
+</body>
+</html>

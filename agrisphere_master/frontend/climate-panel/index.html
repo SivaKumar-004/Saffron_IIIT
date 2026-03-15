@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriSphere - Climate Intelligence</title>
+  <!-- Google Fonts for Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div id="app">
+    <a href="/" class="back-link" style="position: absolute; top: 20px; left: 20px; color: #b3c5d5; text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s;">&larr; Back to Main Menu</a>
+    <div class="glass-container">
+      <header>
+        <h1>AgriSphere</h1>
+        <p>Tier 1: Rural Climate & Disaster Intelligence</p>
+      </header>
+
+      <main>
+        <div class="search-section">
+          <input type="text" id="regionInput" placeholder="Enter Region (e.g. Tamil Nadu)" />
+          <button id="searchBtn">Analyze Climate</button>
+          <button id="simulateBtn" class="secondary">Demo Random</button>
+        </div>
+
+        <div class="call-simulation-section"
+          style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+          <h3 style="margin-bottom: 5px;">📞 Farmer Call Simulator</h3>
+          <p style="font-size: 0.85em; opacity: 0.8; margin-bottom: 10px;">Type a natural language message from a farmer
+            (e.g., "I'm Raj from Goa, my number is 9876543210, register me for alerts")</p>
+          <textarea id="callInput" rows="3"
+            style="width: 100%; border-radius: 5px; padding: 10px; background: rgba(0,0,0,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;"
+            placeholder="Simulate incoming call transcript..."></textarea>
+          <button id="sendCallBtn" class="secondary" style="width: 100%;">Process Call via AI</button>
+          <div id="callResponseBox" class="hidden"
+            style="margin-top: 10px; padding: 10px; background: rgba(0,255,100,0.1); border-left: 3px solid #00ff64; border-radius: 4px; font-size: 0.9em;">
+            <strong>AI Response:</strong> <span id="callResponseText">--</span>
+          </div>
+        </div>
+
+        <div id="loader" class="loader hidden"></div>
+
+        <div id="resultsCard" class="results-card hidden">
+          <h2 id="resultRegion">Region Name</h2>
+
+          <div class="metrics-grid">
+            <div class="metric">
+              <span class="metric-label">Temperature</span>
+              <span class="metric-value" id="valTemp">--°C</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Humidity</span>
+              <span class="metric-value" id="valHumidity">--%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Rainfall</span>
+              <span class="metric-value" id="valRain">-- mm</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Wind Speed</span>
+              <span class="metric-value" id="valWind">-- km/h</span>
+            </div>
+          </div>
+
+          <div class="risks-section">
+            <h3>Detected Risks</h3>
+            <ul id="risksList" class="risks-list">
+              <!-- Risks populated via JS -->
+            </ul>
+          </div>
+
+          <div class="recommendation-section">
+            <h3>Advisory</h3>
+            <p id="recommendationText">--</p>
+          </div>
+
+          <div class="dispatch-section">
+            <h3>📞 Farmer Alert Agent</h3>
+            <div id="dispatchBox" class="dispatch-box">
+              <span id="dispatchMethod">--</span>
+              <p id="dispatchLog">--</p>
+              <p id="dispatchMetrics" style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">--</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="errorBox" class="error-box hidden"></div>
+      </main>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="./main.js"></script>
+</body>
+
+</html>

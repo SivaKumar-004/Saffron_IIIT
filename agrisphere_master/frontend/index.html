@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriSphere Platform</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+        :root {
+            --bg-dark: #020617;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --primary-accent: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            background: radial-gradient(circle at top right, #0f172a, #020617);
+        }
+
+        /* Abstract Background Elements */
+        .bg-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            top: -200px;
+            right: -200px;
+            z-index: 0;
+            animation: pulse 10s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.8; }
+            100% { transform: scale(1.1) translate(-50px, 50px); opacity: 1; }
+        }
+
+        .header {
+            text-align: center;
+            z-index: 10;
+            margin-bottom: 4rem;
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #34d399, #10b981, #059669);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.05em;
+            text-shadow: 0px 4px 20px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            font-weight: 300;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            width: 90%;
+            max-width: 1200px;
+            z-index: 10;
+        }
+
+        .card {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 250px;
+        }
+
+        /* Hover Effects */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom right, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        /* Specific Card Styling */
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            z-index: 2;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            z-index: 2;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            z-index: 2;
+        }
+
+        .card.tier1:hover { box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2); border-color: #10b981; }
+        .card.tier2:hover { box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2); border-color: #3b82f6; }
+        .card.tier3:hover { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2); border-color: #8b5cf6; }
+        .card.master:hover { box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2); border-color: #f59e0b; }
+        
+        /* Master tag */
+        .master-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbd38d;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            z-index: 5;
+        }
+
+        /* --- AI Chatbot Widget Styling --- */
+        .chatbot-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #34d399, #059669);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6);
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background: rgba(15, 23, 42, 0.85); /* Deep glass background */
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chatbot-window.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        .chatbot-header {
+            padding: 20px 25px;
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.1), transparent);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chatbot-header-icon {
+            font-size: 1.8rem;
+            background: rgba(16, 185, 129, 0.2);
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .chatbot-header-text h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .chatbot-header-text p {
+            margin: 2px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--primary-accent);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .chatbot-header-text p::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--primary-accent);
+        }
+
+        .chatbot-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .chat-msg {
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg-bot {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom-left-radius: 4px;
+        }
+
+        .msg-user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .chatbot-input-area {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 15px;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .chat-send-btn {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--primary-accent);
+            border: none;
+            border-radius: 12px;
+            width: 45px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            background: var(--primary-accent);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Loading Dots */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 15px 20px;
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            display: none;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); background: var(--primary-accent); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+
+    <header class="header">
+        <h1 class="title">🌱 AgriSphere</h1>
+        <p class="subtitle">Empowering the Future of Precision Farming. Select a specialized tier to view telemetry or access the unified master control view.</p>
+    </header>
+
+    <main class="grid-container">
+        <!-- Tier 1 -->
+        <a href="/climate-panel" class="card tier1">
+            <div class="card-icon">🌍</div>
+            <h2 class="card-title">Climate Intelligence Agent</h2>
+            <p class="card-desc">Tier 1: Global weather analysis, risk detection, and large-scale advisory.</p>
+        </a>
+
+        <!-- Tier 2 -->
+        <a href="/farm-panel" class="card tier2">
+            <div class="card-icon">📡</div>
+            <h2 class="card-title">Precision Sensor Agent</h2>
+            <p class="card-desc">Tier 2: Localized soil moisture, temperature, and farm-level monitoring.</p>
+        </a>
+
+        <!-- Tier 3 -->
+        <a href="/plant-panel" class="card tier3">
+            <div class="card-icon">🌿</div>
+            <h2 class="card-title">Urban Smart Plant Agent</h2>
+            <p class="card-desc">Tier 3: Hyper-local, AI-driven care recommendations for specific crops.</p>
+        </a>
+
+        <!-- Unified Dashboard -->
+        <a href="/dashboard" class="card master">
+            <span class="master-badge">Unified View</span>
+            <div class="card-icon">🎛️</div>
+            <h2 class="card-title">Master Dashboard</h2>
+            <p class="card-desc">The complete orchestrator view displaying synchronized telemetry from all tiers.</p>
+        </a>
+    </main>
+
+    <!-- Master Agent Chatbot Widget -->
+    <div class="chatbot-toggle" id="chatbotToggle">
+        ✨
+    </div>
+
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            <div class="chatbot-header-icon">🧠</div>
+            <div class="chatbot-header-text">
+                <h3>Master AgriSphere Agent</h3>
+                <p>Global Intelligence Active</p>
+            </div>
+        </div>
+        
+        <div class="chatbot-messages" id="chatbotMessages">
+            <!-- Messages handled by JS -->
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <div class="chatbot-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about soil, climate, or crops..." autocomplete="off">
+            <button class="chat-send-btn" id="chatSendBtn">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Existing Animation Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 + (index * 100));
+            });
+        });
+
+        // --- Master Chatbot Logic ---
+        const chatbotToggle = document.getElementById('chatbotToggle');
+        const chatbotWindow = document.getElementById('chatbotWindow');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        let ws = null;
+        let isWsConnected = false;
+
+        // Toggle Window
+        chatbotToggle.addEventListener('click', () => {
+            chatbotWindow.classList.toggle('active');
+            if (chatbotWindow.classList.contains('active') && !isWsConnected) {
+                initWebSocket();
+            }
+        });
+
+        function appendMessage(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('chat-msg', sender === 'user' ? 'msg-user' : 'msg-bot');
+            
+            // Convert simple newlines to <br> for formatting
+            msgDiv.innerHTML = text.replace(/\n/g, '<br>');
+            
+            chatbotMessages.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+
+        function setTyping(isTyping) {
+            if (isTyping) {
+                typingIndicator.classList.add('active');
+                chatbotMessages.appendChild(typingIndicator); // Move to bottom
+                scrollToBottom();
+            } else {
+                typingIndicator.classList.remove('active');
+            }
+        }
+
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            // Assuming the backend is served locally during development, or change this to your production API
+            const wsUrl = `${protocol}//localhost:8000/ws/master-chat`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                isWsConnected = true;
+                console.log("Master Agent connected.");
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                // If it's the "Analyzing" system message, just show typing indicator instead of full message
+                if (data.message.includes("Analyzing across")) {
+                    setTyping(true);
+                    return;
+                }
+
+                setTyping(false);
+                appendMessage('bot', data.message);
+            };
+
+            ws.onclose = () => {
+                isWsConnected = false;
+                appendMessage('bot', 'Lost connection to Master Agent. Please refresh.');
+            };
+
+            ws.onerror = (error) => {
+                console.error("WebSocket Error:", error);
+                setTyping(false);
+            };
+        }
+
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            chatInput.value = '';
+            
+            if (ws && isWsConnected) {
+                ws.send(text);
+            } else {
+                appendMessage('bot', 'Not connected to Master Agent backend.');
+            }
+        }
+
+        // Event Listeners for Input
+        chatSendBtn.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+    </script>
+</body>
+</html>
